@@ -10,16 +10,19 @@ import UIKit
 import CoreData
 
 class ViewController: UITableViewController {
+    
+    // MARK: - Properties
 
     var items: [NSManagedObject] = []
     let cellId = "cellId"
     let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: "Item")
     
+    // MARK: - Init
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        view.backgroundColor = .white
-        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Add", style: .plain, target: self, action: #selector(addItem))
+        setupUI()
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: cellId)
     }
     
@@ -35,7 +38,18 @@ class ViewController: UITableViewController {
         }
     }
     
+  
+    // MARK: - Handlers
+    
+    func setupUI() {
+       
+        view.backgroundColor = .white
+        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Add", style: .plain, target: self, action: #selector(addItem))
+        
+    }
+    
     @objc func addItem(_sender: AnyObject) {
+        
         let alertController = UIAlertController(title: "Add Note", message: "Insert Your Note Here:", preferredStyle: .alert)
         let saveAction = UIAlertAction(title: "Save", style: .default) { [unowned self] action in
             guard let textField = alertController.textFields?.first, let itemToAdd = textField.text else { return }
@@ -49,7 +63,7 @@ class ViewController: UITableViewController {
         present(alertController, animated: true, completion: nil)
     }
     
-    func save(_ itemName: String){
+    func save(_ itemName: String) {
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
         let managedContext = appDelegate.persistentContainer.viewContext
         let entity = NSEntityDescription.entity(forEntityName: "Item", in: managedContext)
@@ -62,41 +76,8 @@ class ViewController: UITableViewController {
         } catch let err as NSError {
             print("failed to save", err)
         }
-        
     }
     
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return items.count
-    }
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: cellId, for: indexPath)
-        let item = items[indexPath.row]
-        cell.textLabel?.text = item.value(forKeyPath: "itemName") as? String
-        return cell
-    }
-    
-    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        return true
-    }
-    
-    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == UITableViewCell.EditingStyle.delete {
-            
-            guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
-            let managedContext = appDelegate.persistentContainer.viewContext
-            
-            managedContext.delete(self.items[indexPath.row])            
-            do {
-                try managedContext.save()
-                self.items.remove(at: indexPath.row)
-                self.fetchRequest
-                self.tableView.reloadData()
-            } catch {
-                print("Failed to delete")
-            }
-            
-        }
-    }
     
 }
 
