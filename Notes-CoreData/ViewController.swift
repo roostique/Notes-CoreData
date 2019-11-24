@@ -36,7 +36,7 @@ class ViewController: UITableViewController {
     }
     
     @objc func addItem(_sender: AnyObject) {
-        let alertController = UIAlertController(title: "Add", message: "please add item", preferredStyle: .alert)
+        let alertController = UIAlertController(title: "Add Note", message: "Insert Your Note Here:", preferredStyle: .alert)
         let saveAction = UIAlertAction(title: "Save", style: .default) { [unowned self] action in
             guard let textField = alertController.textFields?.first, let itemToAdd = textField.text else { return }
             self.save(itemToAdd)
@@ -85,8 +85,7 @@ class ViewController: UITableViewController {
             guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
             let managedContext = appDelegate.persistentContainer.viewContext
             
-            managedContext.delete(self.items[indexPath.row])
-            
+            managedContext.delete(self.items[indexPath.row])            
             do {
                 try managedContext.save()
                 self.items.remove(at: indexPath.row)
